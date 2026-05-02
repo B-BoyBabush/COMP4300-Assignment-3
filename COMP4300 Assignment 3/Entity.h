@@ -7,32 +7,50 @@ class Entity
 {
 	friend class EntityManager;
 
-	std::string		tag{};
-	int				id{};
-	bool			isAlive{};
-
 public:
-	std::shared_ptr<CTransform>		cTransform{};
-	std::shared_ptr<CBoundingBox>	cBoundingBox{};
-	std::shared_ptr<CInput>			cInput{};
-	std::shared_ptr<CAnimation>		cAnimation{};
+	std::string		m_tag{};
+	size_t			m_id{};
+	bool			m_isAlive{ true };
 
-	const std::string_view getTag() const
-	{	return tag;	}
+	std::tuple<CTransform,
+		CBoundingBox,
+		CInput,
+		CAnimation>
+		m_components{};
 
-	const int& getID() const
-	{	return id;	}
+	Entity(const std::string& t = "none", const size_t& i = 0)
+		: m_tag{ t }
+		, m_id{ i }
+	{
+	}
+
+	const std::string& getTag() const
+	{
+		return m_tag;
+	}
+
+	const size_t& getID() const
+	{
+		return m_id;
+	}
 
 	const bool& getStatus() const
-	{	return isAlive;	}
+	{
+		return m_isAlive;
+	}
 
-private:
-	Entity()
-	{}
+	template <typename T>
+	T& getComponent()
+	{
+		return std::get<T>(m_components);
+	}
 
-	Entity(const std::string& t="none", const int& i=0, const bool& b=true)
-		: tag{ t }
-		, id{ i }
-		, isAlive{ b }
-	{}
+	template <typename T, typename... TArgs>
+	T& addComponent(TArgs&&... mArgs)
+	{
+		T& component = getComponent<T>();
+		component = T{ std::forward<T>(mArgs...)};
+		component.has = true;
+		return component;
+	}
 };

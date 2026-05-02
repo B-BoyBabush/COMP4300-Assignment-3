@@ -5,10 +5,12 @@
 class Assets
 {
 public:
-	std::vector<std::shared_ptr<sf::Texture>> textures{};
+	std::vector<sf::Texture> textures{};
 
 	void addTexture()
 	{
 
 	}
+
+
 };

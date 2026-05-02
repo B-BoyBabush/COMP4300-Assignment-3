@@ -2,28 +2,33 @@
 #include "Vec2.h"
 #include "SFML/Graphics.hpp"
 
-class CTransform
+class Component
+{
+public:
+	bool has{ false };
+};
+
+class CTransform : public Component
 {
 public:
 	Vec2		pos{};
 	Vec2		prevPos{};
 	Vec2		vel{};
 	Vec2		scale{};
-	sf::Angle	angle{};
+	float		angle{};
 
-	CTransform()
-	{}
-
-	CTransform(const Vec2& p = { 0.0f, 0.0f }, const Vec2& v = { 0.0f, 0.0f }, const Vec2& s = { 1.0f, 1.0f }, const sf::Angle& a)//add default value for angle
+	CTransform(const Vec2& p = { 0.0f, 0.0f }, const Vec2& v = { 0.0f, 0.0f }, const Vec2& s = { 1.0f, 1.0f }, const float& a=0.0f)//add default value for angle
 		: pos		{ p }
 		, prevPos	{ p }
 		, vel		{ v }
 		, scale		{ s }
 		, angle		{ a }
-	{}
+	{
+		has = true;
+	}
 };
 
-class CBoundingBox
+class CBoundingBox : public Component
 {
 public:
 	const Vec2 size{};
@@ -35,23 +40,36 @@ public:
 	CBoundingBox(const Vec2& s)
 		: size		{ s }
 		, halfSize	{ s.x / 2, s.y / 2 }
-	{}
+	{
+		has = true;
+	}
 };
 
-class CInput
+class CInput : public Component
 {
 public:
+	bool up{ false };
+	bool down{ false };
+	bool left{ false };
+	bool right{ false };
 
+	CInput()
+	{
+		has = true;
+	}
 };
 
-class CAnimation
+class CAnimation : public Component
 {
 public:
-	sf::Sprite sprite;
+	CAnimation()
+	{
+		has = true;
+	}
 
 	CAnimation(sf::Texture& texture)
-		: sprite{ texture }
 	{
+		has = true;
 	}
 
 };

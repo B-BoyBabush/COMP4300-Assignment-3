@@ -1,6 +1,7 @@
 #include "Vec2.h"
 #include "EntityManager.h"
 #include "Entity.h"
+#include "GameEngine.cpp"
 #include <iostream>
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -17,14 +18,33 @@ int main()
 		std::cout << "Could not find image!\n";
 	}
 
-	sf::Sprite sprite{ texture };
-	sprite.setOrigin(sf::Vector2f{ sprite.getTextureRect().size.x / 2.0f, sprite.getTextureRect().size.y / 2.0f });
 
-	//Old^^^
 
-	EntityManager EntityMgmt{};
-	EntityMgmt.addEntity("player");
-	EntityMgmt.update();
+
+
+
+	std::tuple<int, char, bool> somal{};
+	somal = std::make_tuple(5, 'h', true);
+
+	std::cout << std::get<int>(somal) << " " << std::get<char>(somal) << '\n';
+
+
+	somal = std::make_tuple(10, 'j', false);
+
+	std::cout << std::get<int>(somal) << " " << std::get<char>(somal) << '\n';
+
+	std::tuple<CTransform, CInput> jericho{};
+	jericho = std::make_tuple<CTransform, CInput>(Vec2{ 13.0f, 13.0f }, CInput{});
+
+
+	typedef std::tuple<CTransform, CBoundingBox, CInput, CAnimation> compTuple;
+
+	Entity ent{};
+	ent.addComponent<CTransform>(Vec2{ 1.0f, 1.0f });
+	
+
+
+
 
 
 
@@ -43,17 +63,9 @@ int main()
 		}
 
 		window.clear(sf::Color::Black);
-		window.draw(sprite);
-
-		for (auto& e : EntityMgmt.getEntities())
-		{
-			if (e->cAnimation)
-				window.draw(e->cAnimation->sprite);
-		}
+	
 
 		window.display();
-
-		sprite.move({ 0.01f, 0.01f });
 	}
 
 	return 0;
