@@ -12,11 +12,12 @@ public:
 	size_t			m_id{};
 	bool			m_isAlive{ true };
 
-	std::tuple<CTransform,
+	[[maybe_unused]] std::tuple
+		<CTransform,
 		CBoundingBox,
 		CInput,
 		CAnimation>
-		m_components{};
+		m_components;
 
 	Entity(const std::string& t = "none", const size_t& i = 0)
 		: m_tag{ t }
@@ -45,11 +46,17 @@ public:
 		return std::get<T>(m_components);
 	}
 
+	template <typename T>
+	bool hasComponent()
+	{
+		return getComponent().has;
+	}
+
 	template <typename T, typename... TArgs>
 	T& addComponent(TArgs&&... mArgs)
 	{
 		T& component = getComponent<T>();
-		component = T{ std::forward<T>(mArgs...)};
+		component = T{ std::forward<TArgs>(mArgs)... };
 		component.has = true;
 		return component;
 	}

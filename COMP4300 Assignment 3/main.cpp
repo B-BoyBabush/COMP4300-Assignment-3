@@ -23,29 +23,13 @@ int main()
 
 
 
-	std::tuple<int, char, bool> somal{};
-	somal = std::make_tuple(5, 'h', true);
-
-	std::cout << std::get<int>(somal) << " " << std::get<char>(somal) << '\n';
-
-
-	somal = std::make_tuple(10, 'j', false);
-
-	std::cout << std::get<int>(somal) << " " << std::get<char>(somal) << '\n';
-
-	std::tuple<CTransform, CInput> jericho{};
-	jericho = std::make_tuple<CTransform, CInput>(Vec2{ 13.0f, 13.0f }, CInput{});
-
-
-	typedef std::tuple<CTransform, CBoundingBox, CInput, CAnimation> compTuple;
 
 	Entity ent{};
-	ent.addComponent<CTransform>(Vec2{ 1.0f, 1.0f });
+	ent.addComponent<CTransform>(Vec2{ 1.0f, 1.0f }, Vec2{ 32.0f, 16.0f });
 	
-
-
-
-
+	EntityManager mgmt{};
+	std::shared_ptr<Entity> player = mgmt.addEntity("player");
+	//player->addComponent<CTransform>(Vec2{ 7.0f, 7.0 });
 
 
 	while (window.isOpen())

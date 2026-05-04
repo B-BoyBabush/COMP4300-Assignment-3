@@ -34,15 +34,10 @@ public:
 	const Vec2 size{};
 	const Vec2 halfSize{};
 
-	CBoundingBox()
-	{}
-
-	CBoundingBox(const Vec2& s)
+	CBoundingBox(const Vec2& s={10.0f, 10.0f})
 		: size		{ s }
 		, halfSize	{ s.x / 2, s.y / 2 }
-	{
-		has = true;
-	}
+	{	has = true;	}
 };
 
 class CInput : public Component
@@ -54,9 +49,7 @@ public:
 	bool right{ false };
 
 	CInput()
-	{
-		has = true;
-	}
+	{	has = true;	}
 };
 
 class CAnimation : public Component
