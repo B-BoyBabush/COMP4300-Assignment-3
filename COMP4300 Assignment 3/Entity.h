@@ -7,23 +7,23 @@ class Entity
 {
 	friend class EntityManager;
 
-public:
-	std::string		m_tag{};
-	size_t			m_id{};
-	bool			m_isAlive{ true };
-
-	[[maybe_unused]] std::tuple
+	typedef std::tuple
 		<CTransform,
 		CBoundingBox,
 		CInput,
 		CAnimation>
-		m_components;
+		ComponentTuple;
+
+public:
+	std::string		m_tag{};
+	size_t			m_id{};
+	bool			m_isAlive{ true };
+	ComponentTuple	m_components;
 
 	Entity(const std::string& t = "none", const size_t& i = 0)
 		: m_tag{ t }
 		, m_id{ i }
-	{
-	}
+	{}
 
 	const std::string& getTag() const
 	{
@@ -49,7 +49,7 @@ public:
 	template <typename T>
 	bool hasComponent()
 	{
-		return getComponent().has;
+		return getComponent<T>().has;
 	}
 
 	template <typename T, typename... TArgs>

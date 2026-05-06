@@ -1,0 +1,5 @@
+
+class Scene_Play
+{
+
+};

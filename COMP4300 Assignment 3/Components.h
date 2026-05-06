@@ -1,6 +1,7 @@
 #pragma once
 #include "Vec2.h"
 #include "SFML/Graphics.hpp"
+#include "Animation.h"
 
 class Component
 {
@@ -17,15 +18,16 @@ public:
 	Vec2		scale{};
 	float		angle{};
 
-	CTransform(const Vec2& p = { 0.0f, 0.0f }, const Vec2& v = { 0.0f, 0.0f }, const Vec2& s = { 1.0f, 1.0f }, const float& a=0.0f)//add default value for angle
+	CTransform()
+	{}
+
+	CTransform(const Vec2& p, const Vec2& v, const Vec2& s, const float& a)
 		: pos		{ p }
 		, prevPos	{ p }
 		, vel		{ v }
 		, scale		{ s }
 		, angle		{ a }
-	{
-		has = true;
-	}
+	{}
 };
 
 class CBoundingBox : public Component
@@ -34,35 +36,35 @@ public:
 	const Vec2 size{};
 	const Vec2 halfSize{};
 
-	CBoundingBox(const Vec2& s={10.0f, 10.0f})
+	CBoundingBox()
+	{}
+
+	CBoundingBox(const Vec2& s)
 		: size		{ s }
 		, halfSize	{ s.x / 2, s.y / 2 }
-	{	has = true;	}
+	{}
 };
 
 class CInput : public Component
 {
 public:
-	bool up{ false };
-	bool down{ false };
-	bool left{ false };
-	bool right{ false };
+	bool up{};
+	bool down{};
+	bool left{};
+	bool right{};
 
 	CInput()
-	{	has = true;	}
+	{}
 };
 
 class CAnimation : public Component
 {
 public:
-	CAnimation()
-	{
-		has = true;
-	}
+	Animation m_animation{};
+	
+	CAnimation(const std::string& name, const Vec2& size, const unsigned int& totalFrames, const unsigned int& speed, const std::string& textureName, const sf::IntRect& textureRect)
+		: m_animation{ name, size, totalFrames, speed, textureName, textureRect }
+	{}
 
-	CAnimation(sf::Texture& texture)
-	{
-		has = true;
-	}
-
+	CAnimation() {}
 };
