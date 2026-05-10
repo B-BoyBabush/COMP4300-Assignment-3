@@ -5,6 +5,9 @@
 
 class GameEngine
 {
+	typedef std::shared_ptr<Entity> EntityPtr;
+	typedef std::vector<EntityPtr>	EntityVec;
+	
 	sf::RenderWindow	m_window{ sf::VideoMode({1600, 900}), "Boshko's Window", sf::State::Windowed };
 	EntityManager		m_entities{};
 	size_t				m_currentFrame{ 1 };
@@ -20,5 +23,5 @@ public:
 	void sRender();
 	void sMovement();
 	void sUserInput();
-	//void sAnimate();
+	void sAnimate();
 };

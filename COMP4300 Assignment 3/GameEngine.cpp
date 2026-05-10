@@ -3,8 +3,14 @@
 
 inline void GameEngine::init()
 {
-	m_assets.addTexture("AxeKnight", "C:/Libraries/Assets/AxeKnight.png");
-	m_assets.addTexture("Eyellure", "C:/Libraries/Assets/Eyellure.png");
+	m_assets.addTexture("Mario", "C:/Libraries/Assets/Mario.png");
+	
+	//DELETE
+	std::vector<sf::Vector2i> rectPos{ { {29, 62}, {52, 62}, {74, 62} } };
+	Animation animObj{ "MarioWalk", 3U, 13U, "Mario", sf::Vector2i{16, 31}, rectPos };
+	animObj.m_txtrPtr = &m_assets.getTexture("Mario");
+	m_assets.addAnimation("MarioWalk", animObj);
+	//DELETE
 
 	m_window.setFramerateLimit(60);
 }
@@ -30,11 +36,24 @@ inline void GameEngine::sUserInput()
 
 inline void GameEngine::sMovement()
 {
-	for (std::shared_ptr<Entity> e : m_entities.getEntities())
+	for (EntityPtr entity : m_entities.getEntities())
 	{
-		if (e->hasComponent<CTransform>())
+		if (entity->hasComponent<CTransform>())
 		{
-			e->getComponent<CTransform>().pos += e->getComponent<CTransform>().vel;
+			entity->getComponent<CTransform>().pos += entity->getComponent<CTransform>().vel;
+		}
+	}
+}
+
+inline void GameEngine::sAnimate()
+{
+	for (EntityPtr entity : m_entities.getEntities())
+	{
+		if (entity->hasComponent<CAnimation>())
+		{
+			Animation& anim = entity->getComponent<CAnimation>().m_animation;
+			anim.m_animFrame = (anim.m_gameFrame / anim.m_speed) % anim.m_totalFrames;
+			anim.m_gameFrame++;
 		}
 	}
 }
@@ -43,17 +62,16 @@ inline void GameEngine::sRender()
 {
 	m_window.clear(sf::Color::Black);
 
-	for (std::shared_ptr<Entity> e : m_entities.getEntities())
+	for (EntityPtr entity : m_entities.getEntities())
 	{
-		if (e->hasComponent<CAnimation>())
+		if (entity->hasComponent<CAnimation>())
 		{
-			/*
-			e->getComponent<CAnimation>().m_animation.update(m_currentFrame);
-			sf::Sprite sprite{ m_assets.getTexture(e->getComponent<CAnimation>().m_animation.m_textureName),
-										e->getComponent<CAnimation>().m_animation.m_textureRect };
-			sprite.setPosition({ e->getComponent<CTransform>().pos.x, e->getComponent<CTransform>().pos.y });
+			Animation& anim = entity->getComponent<CAnimation>().m_animation;
+			sf::Sprite sprite{ *anim.m_txtrPtr, sf::IntRect{ anim.m_framePos[anim.m_animFrame], anim.m_size } };
+			sprite.setPosition(entity->getComponent<CTransform>().pos.toVec2f());
+			sprite.scale({ 5.0f, 5.0f });
+
 			m_window.draw(sprite);
-			*/
 		}
 	}
 
@@ -62,9 +80,9 @@ inline void GameEngine::sRender()
 
 inline void GameEngine::spawnPlayer()
 {
-	std::shared_ptr<Entity> p = m_entities.addEntity("player");
-	p->addComponent<CTransform>(Vec2{ 1500.0f, 400.0f }, Vec2{ -1.0f, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
-	//p->addComponent<CAnimation>(CAnimation{ "Player", Vec2{30.0f, 30.0f}, 4, 15, "AxeKnight", sf::IntRect{{18, 10}, {40, 70}} });
+	EntityPtr p = m_entities.addEntity("player");
+	p->addComponent<CTransform>(Vec2{ 200.0f, 400.0f }, Vec2{ 1.0f, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
+	p->addComponent<CAnimation>(m_assets.getAnimation("MarioWalk"));
 }
 
 inline void GameEngine::spawnEnemy()
@@ -84,6 +102,7 @@ inline void GameEngine::run()
 
 		sUserInput();
 		sMovement();
+		sAnimate();
 		sRender();
 
 		m_currentFrame++;

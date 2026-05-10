@@ -12,3 +12,15 @@ inline sf::Texture& Assets::getTexture(const std::string& textureName)
 {
 	return m_textures[textureName];
 }
+
+inline Animation& Assets::addAnimation(const std::string& animName, Animation& anim)
+{
+	m_animations.emplace(animName, std::move(anim));
+
+	return m_animations[animName];
+}
+
+inline Animation& Assets::getAnimation(const std::string& animName)
+{
+	return m_animations[animName];
+}

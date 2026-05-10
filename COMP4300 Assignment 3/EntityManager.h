@@ -6,7 +6,7 @@ class EntityManager
 {
 public:
 	typedef std::shared_ptr<Entity> EntityPtr;
-	typedef std::vector<EntityPtr> EntityVec;
+	typedef std::vector<EntityPtr>	EntityVec;
 
 private:
 	EntityVec							m_entities{};

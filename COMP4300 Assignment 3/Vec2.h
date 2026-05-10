@@ -22,6 +22,11 @@ public:
 		, y{ vec2f.y }
 	{}
 
+	sf::Vector2f toVec2f()
+	{
+		return sf::Vector2f{ x, y };
+	}
+
 	Vec2 operator+(const Vec2& rhs) const
 	{
 		return Vec2{ x + rhs.x, y + rhs.y };

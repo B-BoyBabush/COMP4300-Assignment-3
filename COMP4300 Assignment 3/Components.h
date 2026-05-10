@@ -60,9 +60,9 @@ class CAnimation : public Component
 {
 public:
 	Animation m_animation{};
-	
-	CAnimation(const std::string& name, const Vec2& size, const unsigned int& totalFrames, const unsigned int& speed, const std::string& textureName, const sf::IntRect& textureRect)
-		: m_animation{ name, size, totalFrames, speed, textureName, textureRect }
+
+	CAnimation(Animation& anim)
+		: m_animation{ anim }
 	{}
 
 	CAnimation() {}
