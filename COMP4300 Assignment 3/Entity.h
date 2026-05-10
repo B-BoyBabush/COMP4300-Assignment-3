@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include "Components.h"
 #include "EntityManager.h"
 
