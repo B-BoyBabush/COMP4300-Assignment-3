@@ -14,20 +14,17 @@ public:
 	unsigned int		m_speed{};
 	unsigned int		m_gameFrame{ 0 };
 
-	std::string					m_textureName{};
-	sf::Vector2i				m_size{};
-	std::vector<sf::Vector2i>	m_framePos{};
-
+	std::string			m_textureName{};
+	sf::IntRect			m_intRect{};
 	const sf::Texture*	m_txtrPtr{ nullptr };
 
 	Animation(const std::string& name, const unsigned int& totalFrames, const unsigned int& speed,
-		const std::string& textureName, const sf::Vector2i& size, const std::vector<sf::Vector2i> framePos)
+		const std::string& textureName, const sf::IntRect intRect)
 		: m_name		{ name }
 		, m_totalFrames	{ totalFrames }
 		, m_speed		{ speed }
 		, m_textureName	{ textureName }
-		, m_size		{ size }
-		, m_framePos	{ framePos }
+		, m_intRect		{ intRect }
 	{}
 
 	Animation()

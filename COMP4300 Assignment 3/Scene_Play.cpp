@@ -55,6 +55,7 @@ void Scene_Play::sAnimate()
 		{
 			Animation& anim = entity->getComponent<CAnimation>().m_animation;
 			anim.m_animFrame = (anim.m_gameFrame / anim.m_speed) % anim.m_totalFrames;
+			anim.m_intRect.position.x = anim.m_animFrame * anim.m_intRect.size.x;
 			anim.m_gameFrame++;
 		}
 	}
@@ -67,18 +68,20 @@ void Scene_Play::sRender()
 	for (EntityPtr entity : m_entities.getEntities())
 	{
 		if (entity->hasComponent<CAnimation>())
-		{
-			Animation& anim = entity->getComponent<CAnimation>().m_animation;
-			sf::Sprite sprite{ *anim.m_txtrPtr, sf::IntRect{ anim.m_framePos[anim.m_animFrame], anim.m_size } };
+		{			
+			sf::Sprite sprite{ *entity->getComponent<CAnimation>().m_animation.m_txtrPtr,
+								entity->getComponent<CAnimation>().m_animation.m_intRect };
+			
 			sprite.setOrigin({ sprite.getLocalBounds().size.x / 2, sprite.getLocalBounds().size.y / 2 });
 			sprite.setPosition(entity->getComponent<CTransform>().pos.toVec2f());
-			sprite.scale({ 5.0f, 5.0f });
 
+			//DELETE
 			if (entity->hasComponent<CState>())
 			{
 				if (entity->getComponent<CState>().state == "walkingLeft")
 					sprite.scale({ -1.0f, 1.0f });
 			}
+			//DELETE
 
 			m_gamePtr->setWindow().draw(sprite);
 		}

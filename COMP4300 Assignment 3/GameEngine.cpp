@@ -49,14 +49,15 @@ void GameEngine::run()
 
 void GameEngine::init()
 {
-	m_assets.addTexture("Mario", "C:/Libraries/Assets/Mario.png");
+	sf::Texture& tempTxtr = m_assets.addTexture("MarioWalk", "C:/Libraries/Assets/SS-MarioWalk.png");
 
 	//DELETE
-	std::vector<sf::Vector2i> rectPos{ { {29, 62}, {52, 62}, {74, 62} } };
-	Animation animObj{ "MarioWalk", 3U, 13U, "Mario", sf::Vector2i{16, 31}, rectPos };
-	animObj.m_txtrPtr = &m_assets.getTexture("Mario");
+	sf::IntRect tempRect{ {0, 0}, {static_cast<int>(tempTxtr.getSize().x) / 3, static_cast<int>(tempTxtr.getSize().y)} };
+	Animation animObj{ "MarioWalk", 3U, 13U, "MarioWalk", tempRect };
+	animObj.m_txtrPtr = &m_assets.getTexture("MarioWalk");
 	m_assets.addAnimation("MarioWalk", animObj);
 	//DELETE
+	 
 
 	m_window.setFramerateLimit(60);
 	m_window.setKeyRepeatEnabled(false);
