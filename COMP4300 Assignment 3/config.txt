@@ -1,0 +1,1 @@
+Animation MarioWalk 3 13 Mario 16 32 29 62 52 62 74 62
