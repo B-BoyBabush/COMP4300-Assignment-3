@@ -5,10 +5,10 @@
 
 class Assets
 {
-public:
 	std::map<std::string, sf::Texture> m_textures{};
 	std::map<std::string, Animation> m_animations{};
 
+public:
 	Assets()
 	{}
 

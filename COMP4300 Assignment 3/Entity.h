@@ -1,4 +1,6 @@
 #pragma once
+#include <iostream>
+#include <tuple>
 #include "Components.h"
 #include "EntityManager.h"
 
@@ -10,7 +12,8 @@ class Entity
 		<CTransform,
 		CBoundingBox,
 		CInput,
-		CAnimation>
+		CAnimation, 
+		CState>
 		ComponentTuple;
 
 public:

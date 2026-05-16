@@ -67,3 +67,12 @@ public:
 
 	CAnimation() {}
 };
+
+class CState : public Component
+{
+public:
+	std::string state{ "idle" };
+	//don't like this. Can it all be one variable? And make it so there's only one bool that can be true at once?
+
+	CState() {}
+};

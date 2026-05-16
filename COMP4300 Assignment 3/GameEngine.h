@@ -1,27 +1,26 @@
 #pragma once
 #include <SFML/Window.hpp>
-#include "EntityManager.h"
-#include "Assets.cpp"
+#include "Assets.h"
+
+class Scene;
 
 class GameEngine
 {
-	typedef std::shared_ptr<Entity> EntityPtr;
-	typedef std::vector<EntityPtr>	EntityVec;
-	
-	sf::RenderWindow	m_window{ sf::VideoMode({1600, 900}), "Boshko's Window", sf::State::Windowed };
-	EntityManager		m_entities{};
-	size_t				m_currentFrame{ 1 };
-	Assets				m_assets{};
+	Assets											m_assets{};
+	sf::RenderWindow								m_window{ sf::VideoMode({1600, 900}), "Boshko's Window", sf::State::Windowed };
+	std::string										m_currentScene{ "play" };
+	std::map<std::string, std::shared_ptr<Scene>>	m_scenes{};
 
 public:
 	GameEngine() {}
 
-	void init();
+	const void sUserInput();
+	void changeScene(const std::string& scene);
 	void run();
-	void spawnPlayer();
-	void spawnEnemy();
-	void sRender();
-	void sMovement();
-	void sUserInput();
-	void sAnimate();
+	void init();
+
+	const sf::RenderWindow& getWindow() const { return m_window; }
+
+	sf::RenderWindow& setWindow() { return m_window; }
+	Assets& setAssets() { return m_assets; }
 };
