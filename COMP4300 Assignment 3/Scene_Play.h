@@ -13,8 +13,11 @@ public:
 		: Scene{ game }
 	{}
 
+	Vec2 gridToMidPixel(const int gridX, const int gridY);
+	void loadLevel();
 	void spawnEnemy();
 	void spawnPlayer();
+
 	void sMovement();
 	void sAnimate();
 	void sRender();

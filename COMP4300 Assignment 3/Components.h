@@ -32,8 +32,8 @@ public:
 class CBoundingBox : public Component
 {
 public:
-	const Vec2 size{};
-	const Vec2 halfSize{};
+	Vec2 size{};
+	Vec2 halfSize{};
 
 	CBoundingBox()
 	{}
@@ -75,4 +75,12 @@ public:
 	//don't like this. Can it all be one variable? And make it so there's only one bool that can be true at once?
 
 	CState() {}
+};
+
+class CGravity : public Component
+{
+public:
+	float gravity{ 0.0 };
+
+	CGravity() {}
 };

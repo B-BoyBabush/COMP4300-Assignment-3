@@ -22,5 +22,5 @@ public:
 	const sf::RenderWindow& getWindow() const { return m_window; }
 
 	sf::RenderWindow& setWindow() { return m_window; }
-	Assets& setAssets() { return m_assets; }
+	Assets& getAssets() { return m_assets; }
 };

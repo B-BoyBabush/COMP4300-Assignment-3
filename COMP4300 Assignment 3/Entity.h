@@ -13,7 +13,8 @@ class Entity
 		CBoundingBox,
 		CInput,
 		CAnimation, 
-		CState>
+		CState,
+		CGravity>
 		ComponentTuple;
 
 public:

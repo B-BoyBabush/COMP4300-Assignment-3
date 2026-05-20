@@ -17,10 +17,22 @@ public:
 		, y{ iny }
 	{}
 
+	Vec2(const int& inx, const int& iny)
+		: x{ static_cast<float>(inx) }
+		, y{ static_cast<float>(iny) }
+	{
+	}
+
 	Vec2(sf::Vector2f vec2f)
 		: x{ vec2f.x }
 		, y{ vec2f.y }
 	{}
+
+	Vec2(sf::Vector2i vec2i)
+		: x{ static_cast<float>(vec2i.x) }
+		, y{ static_cast<float>(vec2i.y) }
+	{
+	}
 
 	sf::Vector2f toVec2f()
 	{
@@ -72,6 +84,34 @@ public:
 	{
 		x /= rhs.x;
 		y /= rhs.y;
+		return *this;
+	}
+
+	Vec2 operator+=(int num)
+	{
+		x = x + num;
+		y = y + num;
+		return *this;
+	}
+
+	Vec2 operator-=(int num)
+	{
+		x -= num;
+		y -= num;
+		return *this;
+	}
+
+	Vec2 operator*=(int num)
+	{
+		x *= num;
+		y *= num;
+		return *this;
+	}
+
+	Vec2 operator/=(int num)
+	{
+		x /= num;
+		y /= num;
 		return *this;
 	}
 
