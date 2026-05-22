@@ -71,10 +71,15 @@ public:
 class CState : public Component
 {
 public:
-	std::string state{ "idle" };
-	//don't like this. Can it all be one variable? And make it so there's only one bool that can be true at once?
+	std::string m_state{ "idle" };
+	bool m_facingRight{ true };
 
 	CState() {}
+
+	CState(const std::string& s)
+		: m_state{ s }
+		, m_facingRight{ true }
+	{}
 };
 
 class CGravity : public Component
@@ -83,4 +88,8 @@ public:
 	float gravity{ 0.0 };
 
 	CGravity() {}
+
+	CGravity(float g)
+		: gravity{ g }
+	{}
 };

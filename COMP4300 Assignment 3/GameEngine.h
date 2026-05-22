@@ -18,6 +18,7 @@ public:
 	void changeScene(const std::string& scene);
 	void run();
 	void init();
+	void loadAssets();
 
 	const sf::RenderWindow& getWindow() const { return m_window; }
 

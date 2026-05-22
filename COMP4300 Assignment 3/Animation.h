@@ -10,7 +10,7 @@ public:
 
 	std::string			m_name{};
 	unsigned int		m_animFrame{ 1 };
-	unsigned int		m_totalFrames{};
+	unsigned int		m_totalFrames{ 1 };
 	unsigned int		m_speed{};
 	unsigned int		m_gameFrame{ 0 };
 

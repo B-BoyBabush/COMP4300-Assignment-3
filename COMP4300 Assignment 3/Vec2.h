@@ -115,6 +115,22 @@ public:
 		return *this;
 	}
 
+	bool operator>(Vec2 rhs)
+	{
+		if (x > rhs.x && y > rhs.y)
+			return true;
+		else
+			return false;
+	}
+
+	bool operator<(Vec2 rhs)
+	{
+		if (x < rhs.x && y < rhs.y)
+			return true;
+		else
+			return false;
+	}
+
 	Vec2 normalize()
 	{
 		float c = std::sqrt(x * x + y * y);

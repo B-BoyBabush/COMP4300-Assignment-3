@@ -1,8 +1,8 @@
 #pragma once
-#include <iostream>
-#include <tuple>
 #include "Components.h"
 #include "EntityManager.h"
+#include <iostream>
+#include <tuple>
 
 class Entity
 {
@@ -17,7 +17,6 @@ class Entity
 		CGravity>
 		ComponentTuple;
 
-public:
 	std::string		m_tag{};
 	size_t			m_id{};
 	bool			m_isAlive{ true };
@@ -26,7 +25,9 @@ public:
 	Entity(const std::string& t = "none", const size_t& i = 0)
 		: m_tag{ t }
 		, m_id{ i }
+		, m_isAlive{ true }
 	{}
+public:
 
 	const std::string& getTag() const
 	{
