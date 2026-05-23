@@ -1,5 +1,8 @@
 #pragma once
 #include "Scene.h"
+#include "Entity.h"
+#include "GameEngine.h"
+#include "Vec2.h"
 #include "Action.h"
 
 class Scene_Play : public Scene

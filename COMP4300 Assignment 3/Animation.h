@@ -1,13 +1,13 @@
 #pragma once
-#include <iostream>
-#include <SFML/Graphics.hpp>
 #include "Vec2.h"
+
+#include <SFML/Graphics.hpp>
+
+#include <iostream>
 
 class Animation
 {
 public:
-	typedef std::pair<int, int> IntPair;
-
 	std::string			m_name{};
 	unsigned int		m_animFrame{ 1 };
 	unsigned int		m_totalFrames{ 1 };

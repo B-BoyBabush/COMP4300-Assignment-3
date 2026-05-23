@@ -1,6 +1,10 @@
-#pragma once
 #include "Scene_Play.h"
+#include "Entity.h"
+#include "EntityManager.h"
+#include "GameEngine.h"
 #include "Action.h"
+#include "Physics.h"
+
 #include <fstream>
 
 Vec2 Scene_Play::gridToMidPixel(int gridX, int gridY, EntityPtr entity)
@@ -78,21 +82,10 @@ void Scene_Play::spawnPlayer()
 	m_player = m_entities.addEntity("player");
 	m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioIdle"));
 	m_player->addComponent<CTransform>(Vec2{ gridToMidPixel(2, 1, m_player) }, Vec2{0.0f, 0.0f}, Vec2{1.0f, 1.0f}, 0.0f);
+	m_player->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().m_animation.m_intRect.size);
 	m_player->addComponent<CInput>();
 	m_player->addComponent<CState>();
 	m_player->addComponent<CGravity>();
-}
-
-void Scene_Play::sCollision()
-{
-	//Physics physics{};
-	//for every entity, call physics overlap to see if there's any overlap with an object. If there is, then do smthn?
-
-
-	//or maybe just for player and then for all bullet entities?
-	//sMovement calls sCollision? after 
-
-	//if overlap x >= 0 && overlap y >= 0 then there's a collision
 }
 
 void Scene_Play::sMovement()
@@ -101,43 +94,74 @@ void Scene_Play::sMovement()
 
 	//Add player input
 	if (m_player->getComponent<CInput>().up == true)
-		m_player->getComponent<CTransform>().vel.y = -3.0f;
+	{
+		if (m_player->getComponent<CState>().m_state != "air")
+		{
+			m_player->getComponent<CTransform>().vel.y = -16.0f;
+			m_player->getComponent<CState>().m_state = "air";
+		}
+	}
+	if (m_player->getComponent<CInput>().up == false && m_player->getComponent<CTransform>().vel.y < 0.0f)
+		m_player->getComponent<CTransform>().vel.y -= m_player->getComponent<CTransform>().vel.y;
 	if (m_player->getComponent<CInput>().left == true)
-		m_player->getComponent<CTransform>().vel.x += -3.0f;
-	if (m_player->getComponent<CInput>().down == true)
-		m_player->getComponent<CTransform>().vel.y += 3.0f;
+		m_player->getComponent<CTransform>().vel.x += -5.0f;
 	if (m_player->getComponent<CInput>().right == true)
-		m_player->getComponent<CTransform>().vel.x += 3.0f;
+		m_player->getComponent<CTransform>().vel.x += 5.0f;
 
-	//Maybe check gravity values here?
-	//Maybe call sCollisions right here? after we check inputs
-	//or maybe sCollisions will directly adjust the player's pos/vel
-	sCollision();
+	m_player->getComponent<CTransform>().vel.y += m_player->getComponent<CGravity>().gravity;
 	
 	for (EntityPtr entity : m_entities.getEntities())
 	{
 		if (entity->hasComponent<CTransform>())
-		{
-			if (entity->hasComponent<CGravity>())
-				entity->getComponent<CTransform>().vel.y += entity->getComponent<CGravity>().gravity;
-			
+		{			
 			entity->getComponent<CTransform>().prevPos = entity->getComponent<CTransform>().pos;
 			entity->getComponent<CTransform>().pos += entity->getComponent<CTransform>().vel;
 		}
 	}
 }
 
-void Scene_Play::sState()
+void Scene_Play::sCollision()
 {
-	if (m_player->getComponent<CTransform>().vel.x == 0.0f)
-		m_player->getComponent<CState>().m_state = "idle";
-	if (m_player->getComponent<CTransform>().vel.x != 0.0f)
-		m_player->getComponent<CState>().m_state = "walking";
-	if (m_player->getComponent<CTransform>().vel.y < 0.0f)
-		m_player->getComponent<CState>().m_state = "jumping";
-	if (m_player->getComponent<CTransform>().vel.y > 0.0f)
-		m_player->getComponent<CState>().m_state = "falling";
+	Physics physics{};
+	for (EntityPtr entity : m_entities.getEntities("Ground"))
+	{
+		Vec2 overlap = physics.getOverlap(m_player, entity);
+		if (overlap > Vec2{ 0.0f, 0.0f })
+		{
+			m_player->getComponent<CTransform>().vel.y = 0.0f;
+			m_player->getComponent<CTransform>().prevPos.y = m_player->getComponent<CTransform>().pos.y;
+			m_player->getComponent<CTransform>().pos.y -= overlap.y;
+				
+			if (m_player->getComponent<CTransform>().vel.x != 0.0f)
+				m_player->getComponent<CState>().m_state = "walking";
+			if (m_player->getComponent<CTransform>().vel.y != 0.0f)
+				m_player->getComponent<CState>().m_state = "air";
+			if (m_player->getComponent<CTransform>().vel.x == 0.0f)
+				m_player->getComponent<CState>().m_state = "idle";
+		}
+	}
 
+	for (EntityPtr entity : m_entities.getEntities("Block"))
+	{
+		Vec2 overlap = physics.getOverlap(m_player, entity);
+		if (overlap > Vec2{ 0.0f, 0.0f })
+		{
+			m_player->getComponent<CTransform>().vel.y = 0.0f;
+			m_player->getComponent<CTransform>().prevPos.y = m_player->getComponent<CTransform>().pos.y;
+			m_player->getComponent<CTransform>().pos.y -= overlap.y;
+
+			if (m_player->getComponent<CTransform>().vel.x != 0.0f)
+				m_player->getComponent<CState>().m_state = "walking";
+			if (m_player->getComponent<CTransform>().vel.y != 0.0f)
+				m_player->getComponent<CState>().m_state = "air";
+			if (m_player->getComponent<CTransform>().vel.x == 0.0f)
+				m_player->getComponent<CState>().m_state = "idle";
+		}
+	}
+}
+
+void Scene_Play::sState()
+{	
 	for (EntityPtr entity : m_entities.getEntities())
 	{
 		if (entity->hasComponent<CState>())
@@ -166,7 +190,7 @@ void Scene_Play::sAnimate()
 		{
 			m_player->getComponent<CAnimation>().m_animation = m_gamePtr->getAssets().getAnimation("MarioIdle");
 		}
-		else if (m_player->getComponent<CState>().m_state == "jumping")
+		else if (m_player->getComponent<CState>().m_state == "air")
 		{
 			m_player->getComponent<CAnimation>().m_animation = m_gamePtr->getAssets().getAnimation("MarioJump");
 		}
@@ -256,6 +280,7 @@ void Scene_Play::update()
 	m_entities.update();
 
 	sMovement();
+	sCollision();
 	sState();
 	sAnimate();
 	sRender();

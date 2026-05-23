@@ -1,6 +1,10 @@
 #pragma once
-#include <SFML/Window.hpp>
 #include "Assets.h"
+#include "Scene.h"
+
+#include <SFML/Window.hpp>
+
+#include <iostream>
 
 class Scene;
 

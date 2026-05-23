@@ -1,7 +1,9 @@
-#pragma once
-#include <iostream>
 #include "Assets.h"
+
 #include "SFML/Graphics.hpp"
+
+#include <iostream>
+#include <map>
 
 sf::Texture& Assets::addTexture(const std::string& textureName, const std::string& filename)
 {

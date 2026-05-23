@@ -1,15 +1,16 @@
 #pragma once
 #include "Entity.h"
-#include <map>
-#include <memory>
 
+#include <iostream>
+#include <memory>
+#include <map>
+#include <algorithm>
+
+typedef std::shared_ptr<Entity> EntityPtr;
+typedef std::vector<EntityPtr>	EntityVec;
 
 class EntityManager
 {
-	typedef std::shared_ptr<Entity> EntityPtr;
-	typedef std::vector<EntityPtr>	EntityVec;
-
-
 	EntityVec							m_entities{};
 	EntityVec							m_toAdd{};
 	std::map<std::string, EntityVec>	m_map{};

@@ -1,14 +1,17 @@
 #pragma once
-#include <map>
 #include "EntityManager.h"
 #include "Action.h"
-#include "GameEngine.h"
+
+#include "SFML/System.hpp"
+
+#include <iostream>
+#include <map>
+
+class GameEngine;
 
 class Scene
 {
 protected:
-	typedef std::shared_ptr<Entity> EntityPtr;
-
 	GameEngine*										m_gamePtr{ nullptr };
 	std::map<sf::Keyboard::Scancode, std::string>	m_actions{};
 	EntityManager									m_entities{};

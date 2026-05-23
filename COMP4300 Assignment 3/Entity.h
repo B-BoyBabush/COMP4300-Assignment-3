@@ -1,11 +1,14 @@
 #pragma once
 #include "Components.h"
-#include "EntityManager.h"
-#include <iostream>
+
 #include <tuple>
+#include <iostream>
+
+class EntityManager;
 
 class Entity
 {
+public:
 	friend class EntityManager;
 
 	typedef std::tuple
@@ -22,12 +25,15 @@ class Entity
 	bool			m_isAlive{ true };
 	ComponentTuple	m_components;
 
+	Entity()
+	{
+	}
+
 	Entity(const std::string& t = "none", const size_t& i = 0)
 		: m_tag{ t }
 		, m_id{ i }
 		, m_isAlive{ true }
 	{}
-public:
 
 	const std::string& getTag() const
 	{
@@ -42,6 +48,11 @@ public:
 	const bool& getStatus() const
 	{
 		return m_isAlive;
+	}
+
+	void destroy()
+	{
+		m_isAlive = false;
 	}
 
 	template <typename T>

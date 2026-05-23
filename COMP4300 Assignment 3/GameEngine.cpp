@@ -1,8 +1,12 @@
-#pragma once
 #include "GameEngine.h"
-#include "Animation.h"
-#include "SFML/Graphics.hpp"
+#include "Action.h"
 #include "Scene_Play.h"
+#include "Animation.h"
+
+#include "SFML/Graphics.hpp"
+
+#include <memory>
+#include <map>
 
 const void GameEngine::sUserInput()
 {
@@ -52,7 +56,7 @@ void GameEngine::loadAssets()
 	const sf::Texture* tempTxtr = &m_assets.addTexture("MarioWalk", "C:/Libraries/Assets/SS-MarioWalk.png");
 
 	sf::IntRect tempRect = { {0, 0}, {static_cast<int>(tempTxtr->getSize().x) / 3, static_cast<int>(tempTxtr->getSize().y)} };
-	Animation animObj{ "MarioWalk", 3U, 13U, "MarioWalk", tempRect };
+	Animation animObj{ "MarioWalk", 3U, 10U, "MarioWalk", tempRect };
 	animObj.m_txtrPtr = &m_assets.getTexture("MarioWalk");
 	m_assets.addAnimation("MarioWalk", animObj);
 

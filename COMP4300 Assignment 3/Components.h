@@ -2,6 +2,8 @@
 #include "Vec2.h"
 #include "Animation.h"
 
+#include <iostream>
+
 class Component
 {
 public:
@@ -85,7 +87,7 @@ public:
 class CGravity : public Component
 {
 public:
-	float gravity{ 0.0 };
+	float gravity{ 0.5f };
 
 	CGravity() {}
 

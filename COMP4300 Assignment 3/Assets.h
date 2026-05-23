@@ -1,7 +1,10 @@
 #pragma once
-#include <map>
-#include <SFML/Graphics.hpp>
 #include "Animation.h"
+
+#include <SFML/Graphics.hpp>
+
+#include <map>
+#include <iostream>
 
 class Assets
 {

@@ -1,7 +1,9 @@
 #pragma once
 
-#include <iostream>
 #include <SFML/System.hpp>
+
+#include <iostream>
+#include <cmath>
 
 class Vec2
 {
@@ -113,6 +115,14 @@ public:
 		x /= num;
 		y /= num;
 		return *this;
+	}
+
+	bool operator==(Vec2 rhs)
+	{
+		if (x == rhs.x && y == rhs.y)
+			return true;
+		else
+			return false;
 	}
 
 	bool operator>(Vec2 rhs)
