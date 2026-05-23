@@ -15,11 +15,16 @@ class CTransform : public Component
 public:
 	Vec2		pos{};
 	Vec2		prevPos{};
-	Vec2		vel{};
-	Vec2		scale{};
-	float		angle{};
+	Vec2		vel{ 0.0f, 0.0f };
+	Vec2		scale{ 1.0f, 1.0f };
+	float		angle{ 0.0f };
 
 	CTransform()
+	{}
+
+	CTransform(const Vec2& p)
+		: pos{ p }
+		, prevPos{ p }
 	{}
 
 	CTransform(const Vec2& p, const Vec2& v, const Vec2& s, const float& a)
@@ -49,10 +54,11 @@ public:
 class CInput : public Component
 {
 public:
-	bool up{};
-	bool down{};
-	bool left{};
-	bool right{};
+	bool up{ false };
+	bool down{ false };
+	bool left{ false };
+	bool right{ false };
+	bool attack{ false };
 
 	CInput()
 	{}

@@ -23,47 +23,34 @@ void Scene_Play::loadLevel()
 	spawnPlayer();
 	
 	std::ifstream fin{ "C:/Libraries/Assets/Level_One.txt" };
-	std::string tileType{};
+	std::string type{};
 	
-	while (fin >> tileType)
+	while (fin >> type)
 	{
-		if (tileType == "Ground")
+		if (type == "Ground" || type == "Block" || type == "Brick")
 		{
 			int gridX{};
 			int gridY{};
 
 			fin >> gridX >> gridY;
 			
-			EntityPtr ground = m_entities.addEntity("Ground");
-			ground->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Ground"));
-			ground->addComponent<CTransform>(gridToMidPixel(gridX, gridY, ground), Vec2{ 0.0f, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
-			ground->addComponent<CBoundingBox>(ground->getComponent<CAnimation>().m_animation.m_intRect.size);
+			EntityPtr tile = m_entities.addEntity(type);
+			tile->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation(type));
+			tile->addComponent<CTransform>(gridToMidPixel(gridX, gridY, tile));
+			tile->addComponent<CBoundingBox>(tile->getComponent<CAnimation>().m_animation.m_intRect.size);
 		}
 
-		else if (tileType == "Block")
+		else if (type == "Background")
 		{
+			std::string backgroundName{}; //animation name of background
 			int gridX{};
 			int gridY{};
 
-			fin >> gridX >> gridY;
+			fin >> backgroundName >> gridX >> gridY;
 
-			EntityPtr block = m_entities.addEntity("Block");
-			block->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Block"));
-			block->addComponent<CTransform>(gridToMidPixel(gridX, gridY, block), Vec2{ 0.0f, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
-			block->addComponent<CBoundingBox>(block->getComponent<CAnimation>().m_animation.m_intRect.size);
-		}
-
-		else if (tileType == "Brick")
-		{
-			int gridX{};
-			int gridY{};
-
-			fin >> gridX >> gridY;
-
-			EntityPtr brick = m_entities.addEntity("Brick");
-			brick->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Brick"));
-			brick->addComponent<CTransform>(gridToMidPixel(gridX, gridY, brick), Vec2{ 0.0f, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
-			brick->addComponent<CBoundingBox>(brick->getComponent<CAnimation>().m_animation.m_intRect.size);
+			EntityPtr background = m_entities.addEntity("Background");
+			background->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation(backgroundName));
+			background->addComponent<CTransform>(gridToMidPixel(gridX, gridY, background));
 		}
 	}
 
@@ -79,7 +66,7 @@ void Scene_Play::spawnEnemy()
 
 void Scene_Play::spawnPlayer()
 {
-	m_player = m_entities.addEntity("player");
+	m_player = m_entities.addEntity("Player");
 	m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioIdle"));
 	m_player->addComponent<CTransform>(Vec2{ gridToMidPixel(2, 1, m_player) }, Vec2{0.0f, 0.0f}, Vec2{1.0f, 1.0f}, 0.0f);
 	m_player->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().m_animation.m_intRect.size);
@@ -102,7 +89,7 @@ void Scene_Play::sMovement()
 		}
 	}
 	if (m_player->getComponent<CInput>().up == false && m_player->getComponent<CTransform>().vel.y < 0.0f)
-		m_player->getComponent<CTransform>().vel.y -= m_player->getComponent<CTransform>().vel.y;
+		m_player->getComponent<CTransform>().vel.y = 0.0f;
 	if (m_player->getComponent<CInput>().left == true)
 		m_player->getComponent<CTransform>().vel.x += -5.0f;
 	if (m_player->getComponent<CInput>().right == true)
@@ -123,39 +110,72 @@ void Scene_Play::sMovement()
 void Scene_Play::sCollision()
 {
 	Physics physics{};
-	for (EntityPtr entity : m_entities.getEntities("Ground"))
+	for (EntityPtr entity : m_entities.getEntities())
 	{
 		Vec2 overlap = physics.getOverlap(m_player, entity);
-		if (overlap > Vec2{ 0.0f, 0.0f })
+		
+		//If there was an overlap with a non-player entity
+		if (overlap > Vec2{ 0.0f, 0.0f } && entity->getTag() != m_player->getTag())
 		{
-			m_player->getComponent<CTransform>().vel.y = 0.0f;
-			m_player->getComponent<CTransform>().prevPos.y = m_player->getComponent<CTransform>().pos.y;
-			m_player->getComponent<CTransform>().pos.y -= overlap.y;
-				
-			if (m_player->getComponent<CTransform>().vel.x != 0.0f)
-				m_player->getComponent<CState>().m_state = "walking";
-			if (m_player->getComponent<CTransform>().vel.y != 0.0f)
-				m_player->getComponent<CState>().m_state = "air";
-			if (m_player->getComponent<CTransform>().vel.x == 0.0f)
-				m_player->getComponent<CState>().m_state = "idle";
-		}
-	}
+			//Get the previous overlap too
+			Vec2 prevOverlap = physics.getPrevOverlap(m_player, entity);
+			
+			//If coming from left or right
+			if (prevOverlap.y > 0.0f)
+			{
+				//Move player left or right depending on previous position
+				if (m_player->getComponent<CTransform>().prevPos.x > entity->getComponent<CTransform>().prevPos.x)
+					m_player->getComponent<CTransform>().pos.x += overlap.x;
+				else if (m_player->getComponent<CTransform>().prevPos.x < entity->getComponent<CTransform>().prevPos.x)
+					m_player->getComponent<CTransform>().pos.x -= overlap.x;
+			}
+			
+			//If coming from above or below
+			if (prevOverlap.x > 0.0f)
+			{
+				//For tile entities
+				if (entity->getTag() == "Ground" || entity->getTag() == "Brick" || entity->getTag() == "Block")
+				{
+					//If player is below the tile
+					if (m_player->getComponent<CTransform>().prevPos.y > entity->getComponent<CTransform>().prevPos.y)
+					{
+						//Push the player out and reset his velocity
+						m_player->getComponent<CTransform>().pos.y += overlap.y;
+						m_player->getComponent<CTransform>().vel.y = 0.0f;
+					}
+					//If player is above the tile
+					if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().prevPos.y)
+					{
+						//Push the player out and reset his velocity
+						m_player->getComponent<CTransform>().pos.y -= overlap.y;
+						m_player->getComponent<CTransform>().vel.y = 0.0f;
 
-	for (EntityPtr entity : m_entities.getEntities("Block"))
-	{
-		Vec2 overlap = physics.getOverlap(m_player, entity);
-		if (overlap > Vec2{ 0.0f, 0.0f })
-		{
-			m_player->getComponent<CTransform>().vel.y = 0.0f;
-			m_player->getComponent<CTransform>().prevPos.y = m_player->getComponent<CTransform>().pos.y;
-			m_player->getComponent<CTransform>().pos.y -= overlap.y;
+						//Set player to correct animation
+						if (m_player->getComponent<CTransform>().vel.x != 0.0f)
+							m_player->getComponent<CState>().m_state = "walking";
+						if (m_player->getComponent<CTransform>().vel.x == 0.0f)
+							m_player->getComponent<CState>().m_state = "idle";
+					}
+				}
+			}
 
-			if (m_player->getComponent<CTransform>().vel.x != 0.0f)
-				m_player->getComponent<CState>().m_state = "walking";
-			if (m_player->getComponent<CTransform>().vel.y != 0.0f)
-				m_player->getComponent<CState>().m_state = "air";
-			if (m_player->getComponent<CTransform>().vel.x == 0.0f)
-				m_player->getComponent<CState>().m_state = "idle";
+			//To prevent shuttering when on the corner of a block
+			if (prevOverlap < Vec2{ 0.0f, 0.0f })
+			{
+				if (m_player->getComponent<CTransform>().prevPos.x > entity->getComponent<CTransform>().prevPos.x)
+					m_player->getComponent<CTransform>().pos.x += overlap.x;
+				else if (m_player->getComponent<CTransform>().prevPos.x < entity->getComponent<CTransform>().prevPos.x)
+					m_player->getComponent<CTransform>().pos.x -= overlap.x;
+			}
+
+			//To prevent being stopped when walking left on the ground as normal
+			if (prevOverlap == Vec2{ 0.0f, 0.0f })
+			{
+				if (m_player->getComponent<CTransform>().prevPos.y > entity->getComponent<CTransform>().prevPos.y)
+					m_player->getComponent<CTransform>().pos.y += overlap.y;
+				else if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().prevPos.y)
+					m_player->getComponent<CTransform>().pos.y -= overlap.y;
+			}
 		}
 	}
 }
@@ -212,31 +232,42 @@ void Scene_Play::sAnimate()
 	}
 }
 
+void Scene_Play::draw(EntityPtr entity)
+{
+	if (entity->hasComponent<CAnimation>())
+	{
+		sf::Sprite sprite{ *entity->getComponent<CAnimation>().m_animation.m_txtrPtr,
+							entity->getComponent<CAnimation>().m_animation.m_intRect };
+
+		sprite.setOrigin({ sprite.getLocalBounds().size.x / 2, sprite.getLocalBounds().size.y / 2 });
+		sprite.setPosition(entity->getComponent<CTransform>().pos.toVec2f());
+
+		if (entity->hasComponent<CState>())
+		{
+			if (entity->getComponent<CState>().m_facingRight == true)
+				sprite.scale({ 1.0f, 1.0f });
+			else if (entity->getComponent<CState>().m_facingRight == false)
+				sprite.scale({ -1.0f, 1.0f });
+		}
+
+		m_gamePtr->setWindow().draw(sprite);
+	}
+}
+
 void Scene_Play::sRender()
 {
 	m_gamePtr->setWindow().clear(sf::Color{100, 100, 255});
 
-	for (EntityPtr entity : m_entities.getEntities())
-	{
-		if (entity->hasComponent<CAnimation>())
-		{			
-			sf::Sprite sprite{ *entity->getComponent<CAnimation>().m_animation.m_txtrPtr,
-								entity->getComponent<CAnimation>().m_animation.m_intRect };
-			
-			sprite.setOrigin({ sprite.getLocalBounds().size.x / 2, sprite.getLocalBounds().size.y / 2 });
-			sprite.setPosition(entity->getComponent<CTransform>().pos.toVec2f());
-
-			if (entity->hasComponent<CState>())
-			{
-				if (entity->getComponent<CState>().m_facingRight == true)
-					sprite.scale({ 1.0f, 1.0f });
-				else if (entity->getComponent<CState>().m_facingRight == false)
-					sprite.scale({ -1.0f, 1.0f });
-			}
-
-			m_gamePtr->setWindow().draw(sprite);
-		}
-	}
+	for (EntityPtr entity : m_entities.getEntities("Background"))
+		draw(entity);
+	for (EntityPtr entity : m_entities.getEntities("Brick"))
+		draw(entity);
+	for (EntityPtr entity : m_entities.getEntities("Block"))
+		draw(entity);
+	for (EntityPtr entity : m_entities.getEntities("Ground"))
+		draw(entity);
+	for (EntityPtr entity : m_entities.getEntities("Player"))
+		draw(entity);
 
 	m_gamePtr->setWindow().display();
 }
@@ -253,6 +284,8 @@ void Scene_Play::sDoAction(const Action& action)
 			m_player->getComponent<CInput>().down = true;
 		else if (action.m_name == "RIGHT")
 			m_player->getComponent<CInput>().right = true;
+		else if (action.m_name == "ATTACK")
+			m_player->getComponent<CInput>().attack = true;
 	}
 	if (action.m_type == "END")
 	{
@@ -264,15 +297,18 @@ void Scene_Play::sDoAction(const Action& action)
 			m_player->getComponent<CInput>().down = false;
 		else if (action.m_name == "RIGHT")
 			m_player->getComponent<CInput>().right = false;
+		else if (action.m_name == "ATTACK")
+			m_player->getComponent<CInput>().attack = false;
 	}
 }
 
 void Scene_Play::registerActions()
 {
-	m_actions[sf::Keyboard::Scancode::Space] = "JUMP";
+	m_actions[sf::Keyboard::Scancode::W] = "JUMP";
 	m_actions[sf::Keyboard::Scancode::A] = "LEFT";
 	m_actions[sf::Keyboard::Scancode::S] = "DOWN";
 	m_actions[sf::Keyboard::Scancode::D] = "RIGHT";
+	m_actions[sf::Keyboard::Scancode::Space] = "ATTACK";
 }
 
 void Scene_Play::update()

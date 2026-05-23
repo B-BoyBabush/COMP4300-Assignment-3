@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <map>
+#include <fstream>
 
 const void GameEngine::sUserInput()
 {
@@ -53,54 +54,24 @@ void GameEngine::run()
 
 void GameEngine::loadAssets()
 {
-	const sf::Texture* tempTxtr = &m_assets.addTexture("MarioWalk", "C:/Libraries/Assets/SS-MarioWalk.png");
+	std::ifstream fin{ "C:/Libraries/Assets/AssetsConfig.txt"};
 
-	sf::IntRect tempRect = { {0, 0}, {static_cast<int>(tempTxtr->getSize().x) / 3, static_cast<int>(tempTxtr->getSize().y)} };
-	Animation animObj{ "MarioWalk", 3U, 10U, "MarioWalk", tempRect };
-	animObj.m_txtrPtr = &m_assets.getTexture("MarioWalk");
-	m_assets.addAnimation("MarioWalk", animObj);
+	std::string spriteName{};
+	unsigned int totalFrames{};
+	unsigned int animSpeed{};
+	std::string filename{};
 
-	tempTxtr = &m_assets.addTexture("MarioIdle", "C:/Libraries/Assets/SS-MarioIdle.png");
+	while (fin >> spriteName)
+	{
+		fin >> totalFrames >> animSpeed >> filename;
 
-	tempRect = { {0, 0}, {static_cast<int>(tempTxtr->getSize().x), static_cast<int>(tempTxtr->getSize().y)} };
-	animObj = { "MarioIdle", 1U, 13U, "MarioIdle", tempRect };
-	animObj.m_txtrPtr = &m_assets.getTexture("MarioIdle");
-	m_assets.addAnimation("MarioIdle", animObj);
+		const sf::Texture* tempTxtr = &m_assets.addTexture(spriteName, filename);
 
-	tempTxtr = &m_assets.addTexture("MarioJump", "C:/Libraries/Assets/SS-MarioJump.png");
-
-	tempRect = { {0, 0}, {static_cast<int>(tempTxtr->getSize().x), static_cast<int>(tempTxtr->getSize().y)} };
-	animObj = { "MarioJump", 1U, 13U, "MarioJump", tempRect };
-	animObj.m_txtrPtr = &m_assets.getTexture("MarioJump");
-	m_assets.addAnimation("MarioJump", animObj);
-
-	tempTxtr = &m_assets.addTexture("Bowser", "C:/Libraries/Assets/SS-Bowser.png");
-
-	tempRect = { {0, 0}, {static_cast<int>(tempTxtr->getSize().x) / 4, static_cast<int>(tempTxtr->getSize().y)} }; //4 will be changed to be part of the load assets config
-	animObj = { "Bowser", 4U, 13U, "Bowser", tempRect };
-	animObj.m_txtrPtr = &m_assets.getTexture("Bowser");
-	m_assets.addAnimation("Bowser", animObj);
-
-	tempTxtr = &m_assets.addTexture("Ground", "C:/Libraries/Assets/SS-Ground.png");
-
-	tempRect = { {0, 0}, {static_cast<int>(tempTxtr->getSize().x), static_cast<int>(tempTxtr->getSize().y)} };
-	animObj = { "Ground", 1U, 15U, "Ground", tempRect };
-	animObj.m_txtrPtr = &m_assets.getTexture("Ground");
-	m_assets.addAnimation("Ground", animObj);
-
-	tempTxtr = &m_assets.addTexture("Block", "C:/Libraries/Assets/SS-Block.png");
-
-	tempRect = { {0, 0}, {static_cast<int>(tempTxtr->getSize().x), static_cast<int>(tempTxtr->getSize().y)} };
-	animObj = { "Block", 1U, 15U, "Block", tempRect };
-	animObj.m_txtrPtr = &m_assets.getTexture("Block");
-	m_assets.addAnimation("Block", animObj);
-
-	tempTxtr = &m_assets.addTexture("Brick", "C:/Libraries/Assets/SS-Brick.png");
-
-	tempRect = { {0, 0}, {static_cast<int>(tempTxtr->getSize().x), static_cast<int>(tempTxtr->getSize().y)} };
-	animObj = { "Brick", 1U, 15U, "Brick", tempRect };
-	animObj.m_txtrPtr = &m_assets.getTexture("Brick");
-	m_assets.addAnimation("Brick", animObj);
+		sf::IntRect tempRect = sf::IntRect{ {0, 0}, {static_cast<int>(tempTxtr->getSize().x / totalFrames), static_cast<int>(tempTxtr->getSize().y)} };
+		Animation animObj = Animation{ spriteName, totalFrames, animSpeed, spriteName, tempRect };
+		animObj.m_txtrPtr = &m_assets.getTexture(spriteName);
+		m_assets.addAnimation(spriteName, animObj);
+	}
 }
 
 void GameEngine::init()

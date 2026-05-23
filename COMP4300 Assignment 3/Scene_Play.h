@@ -25,6 +25,7 @@ public:
 	void sMovement();
 	void sState();
 	void sAnimate();
+	void draw(EntityPtr entity);
 	void sRender();
 
 	virtual void sDoAction(const Action& action);
