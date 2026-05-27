@@ -35,7 +35,7 @@ void Scene_Play::loadLevel()
 			fin >> gridX >> gridY;
 			
 			EntityPtr tile = m_entities.addEntity(type);
-			tile->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation(type));
+			tile->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation(type), true);
 			tile->addComponent<CTransform>(gridToMidPixel(gridX, gridY, tile));
 			tile->addComponent<CBoundingBox>(tile->getComponent<CAnimation>().m_animation.m_intRect.size);
 		}
@@ -49,7 +49,7 @@ void Scene_Play::loadLevel()
 			fin >> backgroundName >> gridX >> gridY;
 
 			EntityPtr background = m_entities.addEntity("Background");
-			background->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation(backgroundName));
+			background->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation(backgroundName), true);
 			background->addComponent<CTransform>(gridToMidPixel(gridX, gridY, background));
 		}
 	}
@@ -67,7 +67,7 @@ void Scene_Play::spawnEnemy()
 void Scene_Play::spawnPlayer()
 {
 	m_player = m_entities.addEntity("Player");
-	m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioIdle"));
+	m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioIdle"), true);
 	m_player->addComponent<CTransform>(Vec2{ gridToMidPixel(2, 1, m_player) }, Vec2{0.0f, 0.0f}, Vec2{1.0f, 1.0f}, 0.0f);
 	m_player->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().m_animation.m_intRect.size);
 	m_player->addComponent<CInput>();
@@ -142,6 +142,11 @@ void Scene_Play::sCollision()
 						//Push the player out and reset his velocity
 						m_player->getComponent<CTransform>().pos.y += overlap.y;
 						m_player->getComponent<CTransform>().vel.y = 0.0f;
+						entity->destroy();
+
+						EntityPtr explosion = m_entities.addEntity("Explosion");
+						explosion->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
+						explosion->addComponent<CTransform>(entity->getComponent<CTransform>().pos);
 					}
 					//If player is above the tile
 					if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().prevPos.y)
@@ -204,15 +209,16 @@ void Scene_Play::sAnimate()
 
 		if (m_player->getComponent<CState>().m_state == "walking")
 		{
-			m_player->getComponent<CAnimation>().m_animation = m_gamePtr->getAssets().getAnimation("MarioWalk");
+			m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioWalk"), true);
 		}
 		else if (m_player->getComponent<CState>().m_state == "idle")
 		{
-			m_player->getComponent<CAnimation>().m_animation = m_gamePtr->getAssets().getAnimation("MarioIdle");
+			m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioIdle"), true);
+
 		}
 		else if (m_player->getComponent<CState>().m_state == "air")
 		{
-			m_player->getComponent<CAnimation>().m_animation = m_gamePtr->getAssets().getAnimation("MarioJump");
+			m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioJump"), true);
 		}
 	}
 	
@@ -227,6 +233,10 @@ void Scene_Play::sAnimate()
 				anim.m_animFrame = (anim.m_gameFrame / anim.m_speed) % anim.m_totalFrames;
 				anim.m_intRect.position.x = anim.m_animFrame * anim.m_intRect.size.x;
 				anim.m_gameFrame++;
+
+				auto hasEnded = [](Animation& a) -> bool { return (a.m_gameFrame / a.m_speed) >= a.m_totalFrames; };
+				if (not entity->getComponent<CAnimation>().m_repeat && hasEnded(anim))
+					entity->destroy();
 			}
 		}
 	}
@@ -267,6 +277,10 @@ void Scene_Play::sRender()
 	for (EntityPtr entity : m_entities.getEntities("Ground"))
 		draw(entity);
 	for (EntityPtr entity : m_entities.getEntities("Player"))
+		draw(entity);
+	for (EntityPtr entity : m_entities.getEntities("Explosion"))
+		draw(entity);
+	for (EntityPtr entity : m_entities.getEntities("Fireball"))
 		draw(entity);
 
 	m_gamePtr->setWindow().display();

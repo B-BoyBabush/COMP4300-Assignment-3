@@ -68,9 +68,11 @@ class CAnimation : public Component
 {
 public:
 	Animation m_animation{};
+	bool m_repeat{ false };
 
-	CAnimation(Animation& anim)
+	CAnimation(Animation& anim, bool repeat)
 		: m_animation{ anim }
+		, m_repeat{ repeat }
 	{}
 
 	CAnimation() {}
