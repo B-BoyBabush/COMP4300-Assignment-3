@@ -23,24 +23,24 @@ const void GameEngine::sUserInput()
 			if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
 				m_window.close();
 			
-			Action action{ m_scenes[m_currentScene]->getActions(keyPressed->scancode), "START" };
-			m_scenes[m_currentScene]->sDoAction(action);
+			Action action{ m_currentScene->getActions(keyPressed->scancode), "START" };
+			m_currentScene->sDoAction(action);
 		}
 
 		else if (const auto* keyReleased = event->getIf<sf::Event::KeyReleased>())
 		{
-			Action action{ m_scenes[m_currentScene]->getActions(keyReleased->scancode), "END" };
-			m_scenes[m_currentScene]->sDoAction(action);
+			Action action{ m_currentScene->getActions(keyReleased->scancode), "END" };
+			m_currentScene->sDoAction(action);
 		}
 	}
 
 	return;
 }
 
-void GameEngine::changeScene(const std::string& scene)
+void GameEngine::changeScene(const std::shared_ptr<Scene> scene)
 {
 	m_currentScene = scene;
-	m_scenes[m_currentScene]->init();
+	m_currentScene->init();
 }
 
 void GameEngine::run()
@@ -48,7 +48,7 @@ void GameEngine::run()
 	while (m_window.isOpen())
 	{
 		sUserInput();
-		m_scenes[m_currentScene]->update();
+		m_currentScene->update();
 	}
 }
 
@@ -82,7 +82,7 @@ void GameEngine::init()
 	m_window.setKeyRepeatEnabled(false);
 
 	m_scenes["play"] = std::make_shared<Scene_Play>(this);
-	changeScene("play");
+	changeScene(m_scenes["play"]);
 
 	return;
 }
