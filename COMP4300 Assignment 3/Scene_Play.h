@@ -7,6 +7,8 @@
 
 class Scene_Play : public Scene
 {
+	struct playerConfig { float GX, GY, MX, MY; };
+	
 	EntityPtr m_player{};
 
 public:
@@ -18,7 +20,7 @@ public:
 
 	Vec2 gridToMidPixel(const int gridX, const int gridY, EntityPtr entity);
 	void loadLevel();
-	void spawnEnemy();
+	void spawnFireball();
 	void spawnPlayer();
 
 	void sCollision();

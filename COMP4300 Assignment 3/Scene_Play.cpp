@@ -59,16 +59,20 @@ void Scene_Play::loadLevel()
 	return;
 }
 
-void Scene_Play::spawnEnemy()
+void Scene_Play::spawnFireball()
 {
-
+	EntityPtr fireball = m_entities.addEntity("Fireball");
+	fireball->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Fireball"), false);
+	float velX{ (m_player->getComponent<CState>().m_facingRight ? 7.0f : -7.0f) };
+	fireball->addComponent<CTransform>(m_player->getComponent<CTransform>().pos, Vec2{ velX, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
+	fireball->addComponent<CBoundingBox>(fireball->getComponent<CAnimation>().m_animation.m_intRect.size);
 }
 
 void Scene_Play::spawnPlayer()
 {
 	m_player = m_entities.addEntity("Player");
 	m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioIdle"), true);
-	m_player->addComponent<CTransform>(Vec2{ gridToMidPixel(2, 1, m_player) }, Vec2{0.0f, 0.0f}, Vec2{1.0f, 1.0f}, 0.0f);
+	m_player->addComponent<CTransform>(Vec2{ gridToMidPixel(2, 1, m_player) });
 	m_player->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().m_animation.m_intRect.size);
 	m_player->addComponent<CInput>();
 	m_player->addComponent<CState>();
@@ -120,22 +124,23 @@ void Scene_Play::sCollision()
 			//Get the previous overlap too
 			Vec2 prevOverlap = physics.getPrevOverlap(m_player, entity);
 			
-			//If coming from left or right
-			if (prevOverlap.y > 0.0f)
+			//For tile entities
+			if (entity->getTag() == "Ground" || entity->getTag() == "Brick" || entity->getTag() == "Block")
 			{
-				//Move player left or right depending on previous position
-				if (m_player->getComponent<CTransform>().prevPos.x > entity->getComponent<CTransform>().prevPos.x)
-					m_player->getComponent<CTransform>().pos.x += overlap.x;
-				else if (m_player->getComponent<CTransform>().prevPos.x < entity->getComponent<CTransform>().prevPos.x)
-					m_player->getComponent<CTransform>().pos.x -= overlap.x;
-			}
-			
-			//If coming from above or below
-			if (prevOverlap.x > 0.0f)
-			{
-				//For tile entities
-				if (entity->getTag() == "Ground" || entity->getTag() == "Brick" || entity->getTag() == "Block")
+				//If coming from left or right
+				if (prevOverlap.y > 0.0f)
 				{
+					//Move player left or right depending on previous position
+					if (m_player->getComponent<CTransform>().prevPos.x > entity->getComponent<CTransform>().prevPos.x)
+						m_player->getComponent<CTransform>().pos.x += overlap.x;
+					else if (m_player->getComponent<CTransform>().prevPos.x < entity->getComponent<CTransform>().prevPos.x)
+						m_player->getComponent<CTransform>().pos.x -= overlap.x;
+				}
+
+				//If coming from above or below
+				if (prevOverlap.x > 0.0f)
+				{
+
 					//If player is below the tile
 					if (m_player->getComponent<CTransform>().prevPos.y > entity->getComponent<CTransform>().prevPos.y)
 					{
@@ -161,25 +166,26 @@ void Scene_Play::sCollision()
 						if (m_player->getComponent<CTransform>().vel.x == 0.0f)
 							m_player->getComponent<CState>().m_state = "idle";
 					}
+
 				}
-			}
 
-			//To prevent shuttering when on the corner of a block
-			if (prevOverlap < Vec2{ 0.0f, 0.0f })
-			{
-				if (m_player->getComponent<CTransform>().prevPos.x > entity->getComponent<CTransform>().prevPos.x)
-					m_player->getComponent<CTransform>().pos.x += overlap.x;
-				else if (m_player->getComponent<CTransform>().prevPos.x < entity->getComponent<CTransform>().prevPos.x)
-					m_player->getComponent<CTransform>().pos.x -= overlap.x;
-			}
+				//To prevent shuttering when on the corner of a block
+				if (prevOverlap < Vec2{ 0.0f, 0.0f })
+				{
+					if (m_player->getComponent<CTransform>().prevPos.x > entity->getComponent<CTransform>().prevPos.x)
+						m_player->getComponent<CTransform>().pos.x += overlap.x;
+					else if (m_player->getComponent<CTransform>().prevPos.x < entity->getComponent<CTransform>().prevPos.x)
+						m_player->getComponent<CTransform>().pos.x -= overlap.x;
+				}
 
-			//To prevent being stopped when walking left on the ground as normal
-			if (prevOverlap == Vec2{ 0.0f, 0.0f })
-			{
-				if (m_player->getComponent<CTransform>().prevPos.y > entity->getComponent<CTransform>().prevPos.y)
-					m_player->getComponent<CTransform>().pos.y += overlap.y;
-				else if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().prevPos.y)
-					m_player->getComponent<CTransform>().pos.y -= overlap.y;
+				//To prevent being stopped when walking left on the ground as normal
+				if (prevOverlap == Vec2{ 0.0f, 0.0f })
+				{
+					if (m_player->getComponent<CTransform>().prevPos.y > entity->getComponent<CTransform>().prevPos.y)
+						m_player->getComponent<CTransform>().pos.y += overlap.y;
+					else if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().prevPos.y)
+						m_player->getComponent<CTransform>().pos.y -= overlap.y;
+				}
 			}
 		}
 	}
@@ -312,7 +318,7 @@ void Scene_Play::sDoAction(const Action& action)
 		else if (action.m_name == "RIGHT")
 			m_player->getComponent<CInput>().right = false;
 		else if (action.m_name == "ATTACK")
-			m_player->getComponent<CInput>().attack = false;
+			spawnFireball();
 	}
 }
 
