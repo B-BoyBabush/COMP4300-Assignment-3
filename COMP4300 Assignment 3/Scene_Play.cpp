@@ -20,13 +20,20 @@ Vec2 Scene_Play::gridToMidPixel(int gridX, int gridY, EntityPtr entity)
 void Scene_Play::loadLevel()
 {
 	m_entities = EntityManager();
-	spawnPlayer();
 	
 	std::ifstream fin{ "Assets/Level_One.txt" };
 	std::string type{};
 	
 	while (fin >> type)
 	{
+		if (type == "Player")
+		{
+			fin >> m_playerConfig.GX >> m_playerConfig.GY
+				>> m_playerConfig.MX >> m_playerConfig.MY;
+
+			spawnPlayer();
+		}
+		
 		if (type == "Ground" || type == "Block" || type == "Brick")
 		{
 			int gridX{};
@@ -72,7 +79,7 @@ void Scene_Play::spawnPlayer()
 {
 	m_player = m_entities.addEntity("Player");
 	m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioIdle"), true);
-	m_player->addComponent<CTransform>(Vec2{ gridToMidPixel(2, 1, m_player) });
+	m_player->addComponent<CTransform>(Vec2{ gridToMidPixel(m_playerConfig.GX, m_playerConfig.GY, m_player) });
 	m_player->addComponent<CBoundingBox>(m_player->getComponent<CAnimation>().m_animation.m_intRect.size);
 	m_player->addComponent<CInput>();
 	m_player->addComponent<CState>();
@@ -143,11 +150,11 @@ void Scene_Play::sCollision()
 					//Push the player out and reset his velocity
 					m_player->getComponent<CTransform>().pos.y += overlap.y;
 					m_player->getComponent<CTransform>().vel.y = 0.0f;
-					entity->destroy();
 
-					EntityPtr explosion = m_entities.addEntity("Explosion");
-					explosion->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
-					explosion->addComponent<CTransform>(entity->getComponent<CTransform>().pos);
+					//Change to explosion and remove bounding box (and therefore collisions)
+					entity->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
+					entity->addComponent<CBoundingBox>();
+					entity->getComponent<CBoundingBox>().has = false;
 				}
 				//If player is above the tile
 				if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().prevPos.y)
@@ -190,14 +197,16 @@ void Scene_Play::sCollision()
 		{
 			Vec2 overlap = physics.getOverlap(fireball, tile);
 			
+			//If a fireball hits a tile
 			if (overlap > Vec2{ 0.0f, 0.0f })
 			{
+				//Delete the fireball
 				fireball->destroy();
-				tile->destroy();
 
-				EntityPtr explosion = m_entities.addEntity("Explosion");
-				explosion->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
-				explosion->addComponent<CTransform>(tile->getComponent<CTransform>().pos);
+				//Change the tile to an explosion and remove bounding box (and therefore collisions)
+				tile->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
+				tile->addComponent<CBoundingBox>();
+				tile->getComponent<CBoundingBox>().has = false;
 			}
 		}
 	}

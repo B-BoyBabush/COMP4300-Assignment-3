@@ -7,8 +7,9 @@
 
 class Scene_Play : public Scene
 {
-	struct playerConfig { float GX, GY, MX, MY; };
+	struct playerConfig { int GX, GY; float MX, MY; };
 	
+	playerConfig m_playerConfig{};
 	EntityPtr m_player{};
 
 public:
