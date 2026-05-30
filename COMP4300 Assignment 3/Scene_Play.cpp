@@ -22,7 +22,7 @@ void Scene_Play::loadLevel()
 	m_entities = EntityManager();
 	spawnPlayer();
 	
-	std::ifstream fin{ "C:/Libraries/Assets/Level_One.txt" };
+	std::ifstream fin{ "Assets/Level_One.txt" };
 	std::string type{};
 	
 	while (fin >> type)

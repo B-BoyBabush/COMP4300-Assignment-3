@@ -111,7 +111,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Libraries\Assets;C:\Libraries\glfw-3.4\include;C:\Libraries\SFML-3.0.2/lib;&lt;sfml-install-path&gt;/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Libraries\glfw-3.4\include;C:\Libraries\SFML-3.0.2/lib;&lt;sfml-install-path&gt;/lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenGL32.lib;"C:\Libraries\SFML-3.0.2\lib\sfml-graphics-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-network-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-system-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-window-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-audio-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-main-d.lib";sfml-graphics-d.lib;sfml-audio-d.lib;sfml-main-d.lib;sfml-network-d.lib;sfml-system-d.lib;sfml-window-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -131,7 +131,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\Libraries\Assets;C:\Libraries\glfw-3.4\include;C:\Libraries\SFML-3.0.2/lib;</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Libraries\glfw-3.4\include;C:\Libraries\SFML-3.0.2/lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>OpenGL32.lib;"C:\Libraries\SFML-3.0.2\lib\sfml-graphics-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-network-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-system-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-window-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-audio-d.lib";"C:\Libraries\SFML-3.0.2\lib\sfml-main-d.lib";%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

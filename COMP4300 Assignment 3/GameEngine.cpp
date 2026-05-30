@@ -54,7 +54,7 @@ void GameEngine::run()
 
 void GameEngine::loadAssets()
 {
-	std::ifstream fin{ "C:/Libraries/Assets/AssetsConfig.txt"};
+	std::ifstream fin{ "Assets/AssetsConfig.txt"};
 
 	std::string spriteName{};
 	unsigned int totalFrames{};
