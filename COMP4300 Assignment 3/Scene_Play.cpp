@@ -1,4 +1,5 @@
 #include "Scene_Play.h"
+#include "Scene_Menu.h"
 #include "Entity.h"
 #include "EntityManager.h"
 #include "GameEngine.h"
@@ -17,11 +18,11 @@ Vec2 Scene_Play::gridToMidPixel(int gridX, int gridY, EntityPtr entity)
 	return coord;
 }
 
-void Scene_Play::loadLevel()
+void Scene_Play::loadLevel(const std::string& levelPath)
 {
 	m_entities = EntityManager();
 	
-	std::ifstream fin{ "Assets/Level_One.txt" };
+	std::ifstream fin{ levelPath };
 	std::string type{};
 	
 	while (fin >> type)
@@ -324,6 +325,8 @@ void Scene_Play::sDoAction(const Action& action)
 			m_player->getComponent<CInput>().right = true;
 		else if (action.m_name == "ATTACK")
 			m_player->getComponent<CInput>().attack = true;
+		else if (action.m_name == "ESCAPE")
+			m_gamePtr->changeScene("menu", std::make_shared<Scene_Menu>(m_gamePtr));
 	}
 	if (action.m_type == "END")
 	{
@@ -347,6 +350,7 @@ void Scene_Play::registerActions()
 	m_actions[sf::Keyboard::Scancode::S] = "DOWN";
 	m_actions[sf::Keyboard::Scancode::D] = "RIGHT";
 	m_actions[sf::Keyboard::Scancode::Space] = "ATTACK";
+	m_actions[sf::Keyboard::Scancode::Escape] = "ESCAPE";
 }
 
 void Scene_Play::update()
@@ -362,8 +366,8 @@ void Scene_Play::update()
 	m_currentFrame++;
 }
 
-void Scene_Play::init()
+void Scene_Play::init(const std::string& levelPath)
 {	
 	registerActions();
-	loadLevel();
+	loadLevel(levelPath);
 }

@@ -8,3 +8,7 @@ Brick 1 10 Assets/SS-Brick.png
 Background1 1 10 Assets/SS-Background1.png
 Explosion 3 8 Assets/SS-Explosion.png
 Fireball 4 10 Assets/SS-Fireball.png
+Title 1 10 Assets/Menu-Title.png
+LevelOne 1 10 Assets/Menu-LevelOne.png
+LevelTwo 1 10 Assets/Menu-LevelTwo.png
+LevelThree 1 10 Assets/Menu-LevelThree.png

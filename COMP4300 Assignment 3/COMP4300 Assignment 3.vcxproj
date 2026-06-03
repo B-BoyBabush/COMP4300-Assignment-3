@@ -146,6 +146,7 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Physics.cpp" />
+    <ClCompile Include="Scene_Menu.cpp" />
     <ClCompile Include="Scene_Play.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
@@ -161,6 +162,7 @@
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="Physics.h" />
     <ClInclude Include="Scene.h" />
+    <ClInclude Include="Scene_Menu.h" />
     <ClInclude Include="Scene_Play.h" />
     <ClInclude Include="Vec2.h" />
   </ItemGroup>

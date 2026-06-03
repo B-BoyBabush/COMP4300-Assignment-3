@@ -19,7 +19,7 @@ public:
 	GameEngine() {}
 
 	const void sUserInput();
-	void changeScene(const std::shared_ptr<Scene> scene);
+	void changeScene(const std::string& name, const std::shared_ptr<Scene> scene);
 	void run();
 	void init();
 	void loadAssets();

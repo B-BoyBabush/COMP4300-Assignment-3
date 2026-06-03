@@ -29,7 +29,6 @@ public:
 	virtual void sDoAction(const Action& action) = 0;
 	virtual void registerActions() = 0;
 	virtual void update() = 0;
-	virtual void init() = 0;
 
 	std::string& getActions(const sf::Keyboard::Scancode& key) { return m_actions[key]; }
 };

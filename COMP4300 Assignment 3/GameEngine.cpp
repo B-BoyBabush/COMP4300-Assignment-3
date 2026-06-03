@@ -1,6 +1,7 @@
 #include "GameEngine.h"
 #include "Action.h"
 #include "Scene_Play.h"
+#include "Scene_Menu.h"
 #include "Animation.h"
 
 #include "SFML/Graphics.hpp"
@@ -20,9 +21,6 @@ const void GameEngine::sUserInput()
 
 		else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
 		{
-			if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-				m_window.close();
-			
 			Action action{ m_currentScene->getActions(keyPressed->scancode), "START" };
 			m_currentScene->sDoAction(action);
 		}
@@ -37,10 +35,10 @@ const void GameEngine::sUserInput()
 	return;
 }
 
-void GameEngine::changeScene(const std::shared_ptr<Scene> scene)
+void GameEngine::changeScene(const std::string& name, const std::shared_ptr<Scene> scene)
 {
-	m_currentScene = scene;
-	m_currentScene->init();
+	m_scenes[name] = scene;
+	m_currentScene = m_scenes[name];
 }
 
 void GameEngine::run()
@@ -81,8 +79,7 @@ void GameEngine::init()
 	m_window.setFramerateLimit(60);
 	m_window.setKeyRepeatEnabled(false);
 
-	m_scenes["play"] = std::make_shared<Scene_Play>(this);
-	changeScene(m_scenes["play"]);
+	changeScene("menu", std::make_shared<Scene_Menu>(this));
 
 	return;
 }
