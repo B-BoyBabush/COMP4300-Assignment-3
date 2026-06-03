@@ -1,6 +1,12 @@
 #include "Scene_Menu.h"
 #include "Scene_Play.h"
+#include "EntityManager.h"
+#include "Animation.h"
 
+#include "SFML/Graphics.hpp"
+
+#include <vector>
+#include <map>
 #include <fstream>
 
 void Scene_Menu::loadMenu()

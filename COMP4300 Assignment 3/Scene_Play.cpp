@@ -71,7 +71,7 @@ void Scene_Play::spawnFireball()
 {
 	EntityPtr fireball = m_entities.addEntity("Fireball");
 	fireball->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Fireball"), false);
-	float velX{ (m_player->getComponent<CState>().m_facingRight ? 7.0f : -7.0f) };
+	float velX{ (m_player->getComponent<CState>().m_facingRight ? 10.0f : -10.0f) };
 	fireball->addComponent<CTransform>(m_player->getComponent<CTransform>().pos, Vec2{ velX, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
 	fireball->addComponent<CBoundingBox>(fireball->getComponent<CAnimation>().m_animation.m_intRect.size);
 }
