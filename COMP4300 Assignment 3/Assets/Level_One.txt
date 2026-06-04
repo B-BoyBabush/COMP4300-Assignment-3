@@ -32,7 +32,12 @@ Block 23 2
 Block 24 1
 Block 24 2
 Block 24 3
-Brick 7 3
 Brick 8 3
-Brick 9 3
+Question 9 3
 Brick 10 3
+Question 11 3
+Brick 12 3
+Brick 9 6
+Question 10 6
+Brick 11 6
+Question 10 9

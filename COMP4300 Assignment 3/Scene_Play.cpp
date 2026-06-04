@@ -35,7 +35,7 @@ void Scene_Play::loadLevel(const std::string& levelPath)
 			spawnPlayer();
 		}
 		
-		if (type == "Ground" || type == "Block" || type == "Brick")
+		if (type == "Ground" || type == "Block" || type == "Brick" || type == "Question")
 		{
 			int gridX{};
 			int gridY{};
@@ -69,11 +69,14 @@ void Scene_Play::loadLevel(const std::string& levelPath)
 
 void Scene_Play::spawnFireball()
 {
+	m_player->getComponent<CState>().m_state = "throwing";
+	
 	EntityPtr fireball = m_entities.addEntity("Fireball");
 	fireball->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Fireball"), false);
 	float velX{ (m_player->getComponent<CState>().m_facingRight ? 10.0f : -10.0f) };
 	fireball->addComponent<CTransform>(m_player->getComponent<CTransform>().pos, Vec2{ velX, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
 	fireball->addComponent<CBoundingBox>(fireball->getComponent<CAnimation>().m_animation.m_intRect.size);
+	fireball->addComponent<CGravity>();
 }
 
 void Scene_Play::spawnPlayer()
@@ -106,11 +109,12 @@ void Scene_Play::sMovement()
 		m_player->getComponent<CTransform>().vel.x += -5.0f;
 	if (m_player->getComponent<CInput>().right == true)
 		m_player->getComponent<CTransform>().vel.x += 5.0f;
-
-	m_player->getComponent<CTransform>().vel.y += m_player->getComponent<CGravity>().gravity;
 	
 	for (EntityPtr entity : m_entities.getEntities())
 	{
+		if (entity->hasComponent<CGravity>())
+			entity->getComponent<CTransform>().vel.y += entity->getComponent<CGravity>().gravity;
+		
 		if (entity->hasComponent<CTransform>())
 		{			
 			entity->getComponent<CTransform>().prevPos = entity->getComponent<CTransform>().pos;
@@ -153,9 +157,20 @@ void Scene_Play::sCollision()
 					m_player->getComponent<CTransform>().vel.y = 0.0f;
 
 					//Change to explosion and remove bounding box (and therefore collisions)
-					entity->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
-					entity->addComponent<CBoundingBox>();
-					entity->getComponent<CBoundingBox>().has = false;
+					if (entity->getComponent<CAnimation>().m_animation.m_name == "Brick")
+					{
+						entity->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
+						entity->addComponent<CBoundingBox>();
+						entity->getComponent<CBoundingBox>().has = false;
+					}
+					else if (entity->getComponent<CAnimation>().m_animation.m_name == "Question")
+					{
+						entity->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Question2"), true);
+						
+						EntityPtr coin = m_entities.addEntity("Coin");
+						coin->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Coin"), false);
+						coin->addComponent<CTransform>(Vec2{ entity->getComponent<CTransform>().pos.x, entity->getComponent<CTransform>().pos.y - 64 });
+					}
 				}
 				//If player is above the tile
 				if (m_player->getComponent<CTransform>().prevPos.y < entity->getComponent<CTransform>().prevPos.y)
@@ -201,13 +216,23 @@ void Scene_Play::sCollision()
 			//If a fireball hits a tile
 			if (overlap > Vec2{ 0.0f, 0.0f })
 			{
-				//Delete the fireball
-				fireball->destroy();
+				if (tile->getComponent<CAnimation>().m_animation.m_name == "Brick")
+				{
+					//Delete the fireball
+					fireball->destroy();
 
-				//Change the tile to an explosion and remove bounding box (and therefore collisions)
-				tile->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
-				tile->addComponent<CBoundingBox>();
-				tile->getComponent<CBoundingBox>().has = false;
+					//Change the tile to an explosion and remove bounding box (and therefore collisions)
+					tile->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Explosion"), false);
+					tile->addComponent<CBoundingBox>();
+					tile->getComponent<CBoundingBox>().has = false;
+				}
+				else if (tile->getComponent<CAnimation>().m_animation.m_name == "Ground")
+				{
+					fireball->getComponent<CTransform>().pos.y -= overlap.y;
+					fireball->getComponent<CTransform>().vel.y -= 14.f;
+				}
+				else
+					fireball->destroy();
 			}
 		}
 	}
@@ -242,11 +267,14 @@ void Scene_Play::sAnimate()
 		else if (m_player->getComponent<CState>().m_state == "idle")
 		{
 			m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioIdle"), true);
-
 		}
 		else if (m_player->getComponent<CState>().m_state == "air")
 		{
 			m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioJump"), true);
+		}
+		else if (m_player->getComponent<CState>().m_state == "throwing")
+		{
+			m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioThrow"), true);
 		}
 	}
 	
@@ -262,7 +290,7 @@ void Scene_Play::sAnimate()
 				anim.m_intRect.position.x = anim.m_animFrame * anim.m_intRect.size.x;
 				anim.m_gameFrame++;
 
-				auto hasEnded = [](Animation& a) -> bool { return (a.m_gameFrame / a.m_speed) >= a.m_totalFrames; };
+				auto hasEnded = [](Animation& a) ->bool { return (a.m_gameFrame / a.m_speed) >= a.m_totalFrames; };
 				if (not entity->getComponent<CAnimation>().m_repeat && hasEnded(anim))
 					entity->destroy();
 			}
@@ -306,6 +334,8 @@ void Scene_Play::sRender()
 	for (EntityPtr entity : m_entities.getEntities("Explosion"))
 		draw(entity);
 	for (EntityPtr entity : m_entities.getEntities("Fireball"))
+		draw(entity);
+	for (EntityPtr entity : m_entities.getEntities("Coin"))
 		draw(entity);
 
 	m_gamePtr->setWindow().display();
