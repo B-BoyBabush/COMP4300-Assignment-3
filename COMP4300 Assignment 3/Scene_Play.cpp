@@ -69,14 +69,20 @@ void Scene_Play::loadLevel(const std::string& levelPath)
 
 void Scene_Play::spawnFireball()
 {
-	m_player->getComponent<CState>().m_state = "throwing";
-	
-	EntityPtr fireball = m_entities.addEntity("Fireball");
-	fireball->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Fireball"), false);
-	float velX{ (m_player->getComponent<CState>().m_facingRight ? 10.0f : -10.0f) };
-	fireball->addComponent<CTransform>(m_player->getComponent<CTransform>().pos, Vec2{ velX, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
-	fireball->addComponent<CBoundingBox>(fireball->getComponent<CAnimation>().m_animation.m_intRect.size);
-	fireball->addComponent<CGravity>();
+	static size_t spawnDelay{ 0 };
+	if (m_currentFrame - spawnDelay > 20)
+	{
+		m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioThrow"), false);
+
+		EntityPtr fireball = m_entities.addEntity("Fireball");
+		fireball->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("Fireball"), false);
+		float velX{ (m_player->getComponent<CState>().m_facingRight ? 10.0f : -10.0f) };
+		fireball->addComponent<CTransform>(m_player->getComponent<CTransform>().pos, Vec2{ velX, 0.0f }, Vec2{ 1.0f, 1.0f }, 0.0f);
+		fireball->addComponent<CBoundingBox>(fireball->getComponent<CAnimation>().m_animation.m_intRect.size);
+		fireball->addComponent<CGravity>();
+
+		spawnDelay = m_currentFrame;
+	}
 }
 
 void Scene_Play::spawnPlayer()
@@ -272,10 +278,6 @@ void Scene_Play::sAnimate()
 		{
 			m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioJump"), true);
 		}
-		else if (m_player->getComponent<CState>().m_state == "throwing")
-		{
-			m_player->addComponent<CAnimation>(m_gamePtr->getAssets().getAnimation("MarioThrow"), true);
-		}
 	}
 	
 	//Update all animations
@@ -291,8 +293,16 @@ void Scene_Play::sAnimate()
 				anim.m_gameFrame++;
 
 				auto hasEnded = [](Animation& a) ->bool { return (a.m_gameFrame / a.m_speed) >= a.m_totalFrames; };
-				if (not entity->getComponent<CAnimation>().m_repeat && hasEnded(anim))
-					entity->destroy();
+				if (!entity->getComponent<CAnimation>().m_repeat && hasEnded(anim))
+				{
+					if (entity->m_tag == "Player")
+					{
+						lastState = "";
+						m_player->getComponent<CState>().m_state = "air";
+					}
+					else
+						entity->destroy();
+				}
 			}
 		}
 	}
